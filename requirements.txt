@@ -1,0 +1,23 @@
+# Web Framework
+Flask==3.1.0
+flask-cors==5.0.0
+
+# MQTT Client for sensor data
+paho-mqtt>=2.1.0
+
+# Data Processing
+pandas==2.2.0
+numpy==1.26.4
+
+# Date/Time handling
+python-dateutil==2.8.2
+
+# Task Scheduling
+APScheduler==3.10.1
+
+# Security
+werkzeug>=3.1
+
+# Development Tools
+python-dotenv==1.0.1
+pytest==8.0.1 

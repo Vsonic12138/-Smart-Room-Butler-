@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>酒店管理系统 - 管理员</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <nav class="top-nav">
+            <div class="nav-title">酒店管理系统</div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="switchModule('user-management')">用户管理</button>
+                <button class="nav-btn" onclick="switchModule('room-management')">房间管理</button>
+                <button class="nav-btn" onclick="logout()">退出登录</button>
+            </div>
+            <div id="currentUser" class="current-user"></div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 房间管理模块 -->
+            <div id="room-management" class="module-container">
+                <div class="section">
+                    <h2>房间管理</h2>
+                    <!-- 添加房间表单 -->
+                    <div class="add-room-form">
+                        <input type="text" id="newRoomId" placeholder="输入新房间号">
+                        <button onclick="addNewRoom()">添加房间</button>
+                    </div>
+                    
+                    <!-- 房间列表容器 -->
+                    <div id="roomList" class="room-list">
+                        <!-- 房间卡片将在这里显示 -->
+                    </div>
+                </div>
+
+                <!-- 房间监控部分 -->
+                <div class="monitor-section">
+                      <!--  <div class="room-selector">
+                        <select id="monitorRoomSelect">
+                            <option value="">请选择房间</option>
+                        </select>
+                        
+                        <div class="date-range">
+                            <input type="date" id="startDate">
+                            <span>至</span>
+                            <input type="date" id="endDate">
+                            <button onclick="querySensorHistory()">查询</button>
+                        </div>
+                    </div> -->
+                    
+                    <!-- 历史数据容器 -->
+                    <div id="sensorHistory" class="sensor-history">
+                        <!-- 历史数据将在这里显示 -->
+                    </div>
+                </div>
+
+                <!-- 传感器数据分析部分 -->
+                <div class="stats-section">
+                    <h3>传感器数据分析</h3>
+                    <div class="stats-controls">
+                        <div class="stats-room-select">
+                            <label>选择房间:</label>
+                            <select id="statsRoomSelect">
+                                <option value="">请选择房间</option>
+                            </select>
+                        </div>
+                        <div class="stats-date-select">
+                            <input type="date" id="statsDate">
+                            <button onclick="updateDailyStats()">查询</button>
+                        </div>
+                    </div>
+                    <div id="statsDisplay" class="stats-display">
+                        <!-- 统计数据将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户管理模块 -->
+            <div id="user-management" class="module-container" style="display: none;">
+                <div class="function-card">
+                    <h3>用户管理</h3>
+                    <div class="service-section">
+                        <h2>服务请求</h2>
+                        <div class="service-filter">
+                            <label>
+                                <input type="checkbox" id="showCompleted" onchange="updateServiceRequests()">
+                                显示已完成的服务
+                            </label>
+                        </div>
+                        <div id="serviceRequests" class="service-requests-list">
+                            <!-- 服务请求将在这里动态显示 -->
+                        </div>
+                    </div>
+                    <div class="user-management-controls">
+                        <div class="add-user-form">
+                            <h3>添加新用户</h3>
+                            <div class="form-group">
+                                <label for="newUsername">用户名:</label>
+                                <input type="text" id="newUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">密码:</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newUserRole">角色:</label>
+                                <select id="newUserRole">
+                                    <option value="Customer">客户</option>
+                                    <option value="Admin">管理员</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="roomSelect">房间:</label>
+                                <select id="roomSelect">
+                                    <option value="without">无房间</option>
+                                    <!-- 可用房间将通过 JavaScript 动态添加 -->
+                                </select>
+                            </div>
+                            <button onclick="addUser()">添加用户</button>
+                        </div>
+                        <div class="search-form">
+                            <input type="text" id="searchInput" placeholder="搜索用户名/角色/房间号">
+                            <button onclick="searchUsers()" class="secondary-btn">搜索</button>
+                            <button onclick="resetSearch()" class="secondary-btn">重置</button>
+                        </div>
+                        <div class="user-list">
+                            <h4>现有用户</h4>
+                            <table id="userListTable">
+                                <thead>
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>角色</th>
+                                        <th>房间号</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="function-card">
+                    <h3>待审核用户</h3>
+                    <table id="pendingUsersTable">
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>申请房间</th>
+                                <th>申请时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 待审核用户列表将通过 JavaScript 动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="function-card">
+                    <h3>密码重置请求</h3>
+                    <div class="reset-requests">
+                        <table id="resetRequestsTable">
+                            <thead>
+                                <tr>
+                                    <th>用户名</th>
+                                    <th>申请原因</th>
+                                    <th>申请时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="function-card">
+                    <h3>待审核退房申请</h3>
+                    <table id="pendingCheckoutTable">
+                        <thead>
+                            <tr>
+                                <th>房间号</th>
+                                <th>申请用户</th>
+                                <th>申请时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 退房申请列表将通过 JavaScript 动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html> 

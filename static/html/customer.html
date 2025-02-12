@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>酒店管理系统 - 客户</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <div class="customer-container">
+        <header>
+            <h1>酒店管理系统</h1>
+            <!-- 添加用户信息显示区域 -->
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button onclick="logout()">退出登录</button>
+            </div>
+        </header>
+
+        <div class="room-info">
+            <h2>房间信息</h2>
+            <div id="roomStatus">
+                <!-- 房间状态将在这里显示 -->
+            </div>
+            <div id="roomActions" class="room-actions">
+                <!-- 根据房间状态显示不同的按钮 -->
+            </div>
+            <div class="service-controls">
+                <button onclick="callService()" class="service-btn">呼叫客房服务</button>
+            </div>
+            <div class="sensor-data-container">
+                <h3>房间传感器数据</h3>
+                <button id="refreshSensorData" class="refresh-btn">
+                    <i class="fas fa-sync"></i> 刷新数据
+                </button>
+                <div class="sensor-data">
+                    <div class="sensor-item">
+                        <span class="sensor-label">温度:</span>
+                        <span class="sensor-value temperature">--</span>
+                        <span class="sensor-unit">°C</span>
+                    </div>
+                    <div class="sensor-item">
+                        <span class="sensor-label">湿度:</span>
+                        <span class="sensor-value humidity">--</span>
+                        <span class="sensor-unit">%</span>
+                    </div>
+                    <div class="sensor-item">
+                        <span class="sensor-label">烟雾:</span>
+                        <span class="sensor-value smoke">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="daily-stats">
+           
+        </div>
+    </div>
+    <script src="/static/js/customer.js"></script>
+</body>
+</html> 

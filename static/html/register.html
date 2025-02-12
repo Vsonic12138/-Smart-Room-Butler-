@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>酒店管理系统 - 注册</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>客户注册</h2>
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="用户名" required>
+                <span class="input-message"></span>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="密码" required>
+                <div class="password-strength">
+                    <div class="strength-bar"></div>
+                </div>
+            </div>
+            <div class="input-group">
+                <input type="password" id="confirmPassword" placeholder="确认密码" required>
+                <span class="input-message"></span>
+            </div>
+            <div class="input-group">
+                <select id="roomSelect" required>
+                    <option value="">请选择房间</option>
+                </select>
+                <span class="input-message"></span>
+            </div>
+            <button type="submit" class="primary-btn">提交注册</button>
+            <button type="button" class="secondary-btn" onclick="window.location.href='login.html'">返回登录</button>
+        </form>
+    </div>
+    <script src="/static/js/register.js"></script>
+</body>
+</html> 
